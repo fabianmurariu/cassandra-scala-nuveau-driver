@@ -1,6 +1,5 @@
-package cassandra
+package cassandra.cql
 
-import cassandra.Cql._
 import org.specs2.mutable.Specification
 
 class CqlValueTest extends Specification {

@@ -1,7 +1,7 @@
-package cassandra
+package cassandra.statements
 
-import cassandra.Cql._
-import cassandra.Statements._
+import cassandra.cql._
+import cassandra.statements.Statements._
 import org.specs2.mutable._
 
 class StatementsTest extends Specification {
@@ -26,10 +26,10 @@ class StatementsTest extends Specification {
 
   "CqlTable.createTable" should {
     "list all the column types" in {
-      val column = CqlTable(CqlType("random",
+      val cqlType = CqlType("random",
         "name" -> CqlText("john doe"),
-        "age" -> CqlNumber(23)))
-      column.createTable === "CREATE table random (" +
+        "age" -> CqlNumber(23))
+      cqlType.createTable === "CREATE table random (" +
         "name text," +
         "age int" +
         ")"
@@ -39,10 +39,10 @@ class StatementsTest extends Specification {
 
   "CqlTable.createType" should {
     "list all the column types" in {
-      val column = CqlTable(CqlType("random",
+      val cqlType = CqlType("random",
         "name" -> CqlText("john doe"),
-        "age" -> CqlNumber(23)))
-      column.createType === "CREATE table random (" +
+        "age" -> CqlNumber(23))
+      cqlType.createType === "CREATE type random (" +
         "name text," +
         "age int" +
         ")"

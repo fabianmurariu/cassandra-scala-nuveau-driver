@@ -1,6 +1,8 @@
-package cassandra
+package cassandra.implicits
 
-import cassandra.Cql._
+import cassandra.CqlMacros
+import cassandra.cql._
+import cassandra.format.CqlFormat
 
 trait LowPriorityImplicits{
   implicit def cqlFormat[A]: CqlFormat[A] = macro CqlMacros.cqlFormatMacro[A]
