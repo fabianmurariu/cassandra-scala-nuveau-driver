@@ -26,12 +26,14 @@ class StatementsTest extends Specification {
 
   "CqlTable.createTable" should {
     "list all the column types" in {
-      val cqlType = CqlType("random",
-        "name" -> CqlText("john doe"),
-        "age" -> CqlNumber(23))
-      cqlType.createTable === "CREATE table random (" +
-        "name text," +
-        "age int" +
+      val cqlTypeDefinition = UserDefineDt("random", "firstname" -> TextDt, "lastname" -> TextDt)
+      cqlTypeDefinition.createTable === "CREATE TABLE random (" +
+        "firstname text," +
+        "lastname text" +
+        ")"
+      cqlTypeDefinition.createType === "CREATE TYPE random (" +
+        "firstname text," +
+        "lastname text" +
         ")"
     }
 
@@ -39,12 +41,15 @@ class StatementsTest extends Specification {
 
   "CqlTable.createType" should {
     "list all the column types" in {
-      val cqlType = CqlType("random",
-        "name" -> CqlText("john doe"),
-        "age" -> CqlNumber(23))
-      cqlType.createType === "CREATE type random (" +
-        "name text," +
-        "age int" +
+      val cqlTypeDefinition = UserDefineDt("random",
+        "id" -> UuidDt,
+        "name" -> UserDefineDt("fullname"),
+        "direct_reports" -> ListDt(UserDefineDt("fullname"))
+      )
+      cqlTypeDefinition.createTable === "CREATE TABLE random (" +
+        "id uuid," +
+        "name frozen <fullname>," +
+        "direct_reports list<frozen <fullname>>" +
         ")"
     }
 

@@ -1,6 +1,6 @@
 package cassandra.statements
 
-import cassandra.cql.{CqlTable, CqlType}
+import cassandra.cql.{UserDefineDt, CqlDataType, CqlTable, CqlType}
 import cassandra.format.DataTypeFormat
 
 trait Statements {
@@ -13,10 +13,10 @@ trait Statements {
     lazy val insert = s"INSERT into ${column.ofType.name} $fields VALUES $values"
   }
 
-  implicit class CqlCreate(cqlT: CqlType) extends CqlStatement {
-    lazy val createTable = s"CREATE TABLE ${cqlT.name}"
-
-    def createType: String = s"CREATE TYPE ${cqlT.name}"
+  implicit class CqlCreate(cqlT: UserDefineDt) extends CqlStatement {
+    lazy val createTable = s"CREATE TABLE ${cqlT.userDefinedName} (" + types + ")"
+    lazy val createType = s"CREATE TYPE ${cqlT.userDefinedName} (" + types + ")"
+    lazy val types:String = cqlT.types.map{case (name, cqlDataType) => s"$name ${cqlDataType.name}" }.mkString(",")
   }
 
 }
