@@ -1,5 +1,6 @@
 package cassandra
 
+import cassandra.annotations.Id
 import cassandra.cql._
 import org.specs2.mutable.Specification
 
@@ -40,9 +41,10 @@ class CqlMacrosTest extends Specification {
         val userDefinedType = toUserDefinedType(person)
         userDefinedType === UserDefineDt(
           "person",
+          List("name"),
           "name" -> TextDt,
           "age" -> IntDt,
-          "address" -> UserDefineDt("address", "house" -> IntDt, "street" -> TextDt, "home" -> BooleanDt),
+          "address" -> UserDefineDt("address", Nil ,"house" -> IntDt, "street" -> TextDt, "home" -> BooleanDt),
           "height" -> IntDt,
           "otherNames" -> ListDt(TextDt))
       }
@@ -55,6 +57,6 @@ trait AWhatever
 
 trait Another
 
-case class Person(name: String, age: Int, address: Address, height: Option[Int], otherNames: List[String]) extends AWhatever with Another
+case class Person(@Id name: String, age: Int, address: Address, height: Option[Int], otherNames: List[String]) extends AWhatever with Another
 
 case class Address(house: Int, street: String, home: Boolean)

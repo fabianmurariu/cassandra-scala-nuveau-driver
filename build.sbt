@@ -9,6 +9,7 @@ val commonSettings = Seq(
   scalacOptions ++= Seq("-deprecation", "-feature", "-language:experimental.macros"),
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.4",
     "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1" exclude("org.scala-lang", "scala-library"),
     "org.specs2" %% "specs2" % "2.3.12" % "test" exclude("org.scala-lang", "scala-library")
   )

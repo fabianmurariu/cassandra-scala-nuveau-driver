@@ -14,8 +14,12 @@ trait Statements {
   }
 
   implicit class CqlCreate(cqlT: UserDefineDt) extends CqlStatement {
-    lazy val createTable = s"CREATE TABLE ${cqlT.userDefinedName} (" + types + ")"
-    lazy val createType = s"CREATE TYPE ${cqlT.userDefinedName} (" + types + ")"
+    private lazy val primaryKeys = {
+      val ids = cqlT.ids.mkString(",")
+      if (ids == "") ids else s",PRIMARY KEY ($ids)"
+    }
+    lazy val createTable = s"CREATE TABLE ${cqlT.userDefinedName} ($types$primaryKeys)"
+    lazy val createType = s"CREATE TYPE ${cqlT.userDefinedName} ($types)"
     lazy val types:String = cqlT.types.map{case (name, cqlDataType) => s"$name ${cqlDataType.name}" }.mkString(",")
   }
 

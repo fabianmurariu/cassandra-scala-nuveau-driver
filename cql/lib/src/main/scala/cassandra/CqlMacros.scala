@@ -1,5 +1,6 @@
 package cassandra
 
+import cassandra.annotations.Id
 import cassandra.cql.CqlValue
 import cassandra.format.CqlFormat
 
@@ -39,12 +40,16 @@ class CqlMacros(val c:blackbox.Context) {
            (${method.name.encodedName.toString},
            implicitly[DataTypeFormat[${method.returnType}]].apply())"""
     }
+    val ids = decls collect {
+      case method:Symbol if method.annotations.nonEmpty =>
+        method.name.toString.trim
+    }
 
     val cqlTypeName = tpe.baseClasses.head.name.toString.toLowerCase
 
     val cqlDataTypeFormatter = q"""
     new DataTypeFormat[$tpe] {
-      def apply() = UserDefineDt.apply($cqlTypeName, ..$cqlDataTypes)
+      def apply() = UserDefineDt.apply($cqlTypeName, List(..$ids), ..$cqlDataTypes)
     }
     """
     println(showCode(cqlDataTypeFormatter))
