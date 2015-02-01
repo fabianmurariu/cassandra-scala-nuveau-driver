@@ -41,7 +41,7 @@ class CqlMacros(val c:blackbox.Context) {
            implicitly[DataTypeFormat[${method.returnType}]].apply())"""
     }
     val ids = decls collect {
-      case method:Symbol if method.annotations.nonEmpty =>
+      case method:Symbol if method.annotations.exists(_.tree.tpe =:= typeOf[Id]) =>
         method.name.toString.trim
     }
 
