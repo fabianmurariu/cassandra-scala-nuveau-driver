@@ -20,26 +20,26 @@ class StatementsTest extends Specification {
         "height" -> CqlNumber(165),
         "otherNames" -> CqlList(CqlText("Jack"), CqlText("Black"))))
       column.fields === "(name,age,address,height,otherNames)"
-      column.insert === s"INSERT into random ${column.fields} VALUES ${column.values}"
+      column.insert === s"INSERT into random ${column.fields} VALUES ${column.values};"
     }
   }
 
-  "CqlTable.createTable" should {
+  "CqlTable.createTable and createType" should {
     "list all the column types" in {
       val cqlTypeDefinition = UserDefineDt("random", Nil, "firstname" -> TextDt, "lastname" -> TextDt)
       cqlTypeDefinition.createTable === "CREATE TABLE random (" +
         "firstname text," +
         "lastname text" +
-        ")"
+        ");"
       cqlTypeDefinition.createType === "CREATE TYPE random (" +
         "firstname text," +
         "lastname text" +
-        ")"
+        ");"
     }
 
   }
 
-  "CqlTable.createType" should {
+  "CqlTable.createTable" should {
     "list all the column types" in {
       val cqlTypeDefinition = UserDefineDt("random", List("id", "name"),
         "id" -> UuidDt,
@@ -51,7 +51,7 @@ class StatementsTest extends Specification {
         "name frozen <fullname>," +
         "direct_reports list<frozen <fullname>>," +
         "PRIMARY KEY (id,name)" +
-        ")"
+        ");"
     }
 
   }

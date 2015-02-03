@@ -9,7 +9,7 @@ trait CqlValue {
 case class CqlType(name: String, fields: (String, CqlValue)*) extends CqlValue {
   override lazy val values = s"{${
     fields
-      .map { case (k, v) => s"'$k':${v.values}"}
+      .map { case (k, v) => s"$k:${v.values}"}
       .mkString(",")
   }}"
 }

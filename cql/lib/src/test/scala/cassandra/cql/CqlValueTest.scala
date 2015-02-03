@@ -53,18 +53,18 @@ class CqlValueTest extends Specification {
   }
 
   "CqlType" should {
-    "be {'one':1,'two':2.0,'three':'three','not':false}" in {
+    "be {one:1,two:2.0,three:'three',not:false}" in {
       CqlType("whatever",
         "one" -> CqlNumber(1),
         "two" -> CqlNumber(2.0),
         "three" -> CqlText("three"),
         "not" -> CqlFalse
-      ).values === "{'one':1,'two':2.0,'three':'three','not':false}"
+      ).values === "{one:1,two:2.0,three:'three',not:false}"
     }
   }
 
   "CqlColumn" should {
-    "be (1,'two',false,[1, 2],{'one':1,'two':2.0},{'a','b','c'})" in {
+    "be (1,'two',false,[1, 2],{one:1,two:2.0},{'a','b','c'})" in {
       CqlTable(
         CqlType("random",
           "1"->CqlNumber(1),
@@ -77,7 +77,7 @@ class CqlValueTest extends Specification {
           ),
           "6" -> CqlSet(CqlText("a"), CqlText("b"), CqlNull)
         )
-      ).values === "(1,'two',false,[1,2],{'one':1,'blah':2.0},{'a','b',null})"
+      ).values === "(1,'two',false,[1,2],{one:1,blah:2.0},{'a','b',null})"
     }
   }
 
