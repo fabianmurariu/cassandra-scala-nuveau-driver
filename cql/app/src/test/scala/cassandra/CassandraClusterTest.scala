@@ -55,7 +55,6 @@ class CassandraClusterTest extends Specification {
       val cqlPerson = CqlTable(cqlPersonValue.asInstanceOf[CqlType])
 
       println (cqlPerson.insert)
-      session.execute("use tevinzi;")
       session.execute(cqlPerson.insert)
       true === true // <- fix this once read is available
     }
