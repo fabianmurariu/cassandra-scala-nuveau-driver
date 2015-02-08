@@ -40,9 +40,4 @@ trait CqlDataTypeImplicits extends CqlDataTypeLowPriorityImplicits {
 
 }
 
-object CqlDataTypeImplicits extends CqlDataTypeImplicits {
-  def toUserDefinedType[T: DataTypeFormat](value: T): CqlDataType = {
-    val format = implicitly[DataTypeFormat[T]]
-    format()
-  }
-}
+object CqlDataTypeImplicits extends CqlDataTypeImplicits

@@ -3,12 +3,7 @@ package cassandra
 import cassandra.annotations.Id
 import cassandra.cql._
 import org.specs2.mutable.Specification
-
-import cassandra.implicits.CqlImplicits._
-import cassandra.implicits.CqlDataTypeImplicits._
-
-import cassandra.format.CqlFormat
-import cassandra.format.DataTypeFormat
+import FixtureFormats._
 
 class CqlMacrosTest extends Specification {
 
@@ -16,10 +11,8 @@ class CqlMacrosTest extends Specification {
     "writeCql" should {
       "produce the correct CqlType" in {
         val p = Person("john doe", 23, Address(12, "Lula Str", home = true), Some(165), List("Jack", "Black"))
-
-        val cqlType = writeCql(p)
-
-        cqlType === CqlType("person",
+        val cqlValue = personCqlValueFormat(p)
+        cqlValue === CqlType("person",
           "name" -> CqlText("john doe"),
           "age" -> CqlNumber(23),
           "address" ->
@@ -35,10 +28,7 @@ class CqlMacrosTest extends Specification {
     }
     "toUserDefinedType" should {
       "produce the correct CqlDataType" in {
-        val address = Address(12, "Lula Str", home = true)
-        val person = Person("john doe", 23, address, Some(165), List("Jack", "Black"))
-
-        val userDefinedType = toUserDefinedType(person)
+        val userDefinedType = personCqlDataTypeFormat()
         userDefinedType === UserDefineDt(
           "person",
           List("name"),

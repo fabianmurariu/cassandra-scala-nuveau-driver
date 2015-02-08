@@ -1,4 +1,4 @@
 package cassandra.annotations
 
-//@scala.annotation.meta.field
+@scala.annotation.meta.field
 class Id extends scala.annotation.StaticAnnotation

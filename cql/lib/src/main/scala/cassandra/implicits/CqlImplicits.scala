@@ -57,9 +57,4 @@ trait CqlImplicits extends LowPriorityImplicits{
 
 }
 
-object CqlImplicits extends CqlImplicits{
-  def writeCql[T:CqlFormat](value:T):CqlValue = {
-    val format: CqlFormat[T] = implicitly[CqlFormat[T]]
-    format(value)
-  }
-}
+object CqlImplicits extends CqlImplicits

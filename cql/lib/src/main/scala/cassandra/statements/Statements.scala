@@ -3,7 +3,7 @@ package cassandra.statements
 import cassandra.cql.{UserDefineDt, CqlDataType, CqlTable, CqlType}
 import cassandra.format.DataTypeFormat
 
-trait Statements {
+trait Statements extends Any{
 
   trait CqlStatement
 
