@@ -56,6 +56,29 @@ class CqlMacros(val c:blackbox.Context) {
     cqlDataTypeFormatter
   }
 
+  def cqlRowReaderMacro[A: c.WeakTypeTag]: Tree = {
+    val tpe:Type = c.weakTypeOf[A]
+
+    val readers: List[Tree] = (tpe.decls collect {
+      case method: MethodSymbol if method.isCaseAccessor =>
+        val name = method.name.decodedName.toString
+        q"""(implicitly[CqlDataReader[${method.returnType}]]).apply(Some(String.valueOf($name)),origin)"""
+    }).toList
+
+    val cqlFormatter = q"""
+    new UDTCqlDataReader[$tpe] {
+      override def apply(v1: Option[String], v2: GettableByNameData):$tpe = {
+        val origin = getWithFallBack(v1, v2)
+        new $tpe(..$readers)
+      }
+    }
+    """
+    println(showCode(cqlFormatter))
+    cqlFormatter
+  }
+
+
+
 
 
 }
