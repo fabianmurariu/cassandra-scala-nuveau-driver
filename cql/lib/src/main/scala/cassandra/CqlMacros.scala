@@ -56,6 +56,27 @@ class CqlMacros(val c:blackbox.Context) {
     cqlDataTypeFormatter
   }
 
+  def cqlTupleTypeFormatMacro[A: c.WeakTypeTag]: Tree = {
+    val tpe:Type = c.weakTypeOf[A]
+
+    val typeArgs = tpe.typeArgs
+    val formatArgs = typeArgs.map{
+      argType => q"(implicitly[DataTypeFormat[$argType]]).apply()"
+    }
+
+    val tree = q"""
+       class TupleFormat extends DataTypeFormat[(..$typeArgs)] {
+         override def apply(): CqlDataType = {
+           val l = List(..$formatArgs)
+           TupleDt(l:_*)
+         }
+       }
+       new TupleFormat()
+     """
+    println(showCode(tree))
+    tree
+  }
+
   def cqlRowReaderMacro[A: c.WeakTypeTag]: Tree = {
     val tpe:Type = c.weakTypeOf[A]
 

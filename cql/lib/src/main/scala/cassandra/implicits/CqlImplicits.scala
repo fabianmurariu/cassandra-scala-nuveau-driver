@@ -21,6 +21,10 @@ trait CqlImplicits extends LowPriorityImplicits{
     case false => CqlTrue
   }
 
+  implicit def tupleFormat[T<:Product]:CqlFormat[T] = makeFormat{
+    tuple => CqlTuple() //TODO: MAKE IT SO!
+  }
+
   /*Lists */
 
   class ListFormat[T:CqlFormat] extends CqlFormat[List[T]]{

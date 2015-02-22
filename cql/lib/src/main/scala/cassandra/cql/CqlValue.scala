@@ -14,6 +14,10 @@ case class CqlType(name: String, fields: (String, CqlValue)*) extends CqlValue {
   }}"
 }
 
+case class CqlTuple(fields:CqlValue*) extends CqlValue{
+  override lazy val values = s"(${fields.map(_.values).mkString(",")})"
+}
+
 case class CqlTable(ofType: CqlType) extends CqlValue {
   override lazy val values = s"(${
     ofType.fields.map(_._2.values).mkString(",")

@@ -8,11 +8,14 @@ import scala.language.implicitConversions
 
 trait CqlDataTypeLowPriorityImplicits {
   implicit def cqlDataTypeFormat[A]: DataTypeFormat[A] = macro CqlMacros.cqlDataTypeFormatMacro[A]
+  implicit def cqlTupleTypeFormat[A <: Product]: DataTypeFormat[A] = macro CqlMacros.cqlTupleTypeFormatMacro[A]
 }
 
 trait CqlDataTypeImplicits extends CqlDataTypeLowPriorityImplicits {
 
   implicit val intDataTypeFormat: DataTypeFormat[Int] = makeDataTypeFormat { () => IntDt}
+  implicit val longDataTypeFormat: DataTypeFormat[Long] = makeDataTypeFormat { () => LongDt}
+  implicit val doubleDataTypeFormat: DataTypeFormat[Double] = makeDataTypeFormat { () => DoubleDt}
   implicit val booleanDataTypeFormat: DataTypeFormat[Boolean] = makeDataTypeFormat { () => BooleanDt}
   implicit val stringDataTypeFormat: DataTypeFormat[String] = makeDataTypeFormat { () => TextDt}
 

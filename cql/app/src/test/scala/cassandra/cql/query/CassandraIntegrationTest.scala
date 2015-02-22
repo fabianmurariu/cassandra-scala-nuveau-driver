@@ -2,17 +2,18 @@ package cassandra.cql.query
 
 import java.util.concurrent.TimeUnit
 
-import cassandra.CqlReaderFormats._
-import cassandra.FixtureFormats._
-import cassandra.{Address, CassandraCluster, Person}
+import cassandra.fixtures._
+import cassandra.fixtures.{FixtureFormats, Address, Person}
+import FixtureFormats._
+import cassandra.CassandraCluster
 import com.datastax.driver.core.Row
 import org.specs2.mutable.Specification
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-class SelectTest extends Specification {
+class CassandraIntegrationTest extends Specification {
 
-  "Query" should {
+  "Insert then Query" should {
     "Insert into the database then read with macro formats" in {
 
       val address = Address(2, "Blula Bld", home = true)
@@ -32,6 +33,10 @@ class SelectTest extends Specification {
       person === p1
 
     }
+  }
+  
+  "Create" should {
+    
   }
 
 }

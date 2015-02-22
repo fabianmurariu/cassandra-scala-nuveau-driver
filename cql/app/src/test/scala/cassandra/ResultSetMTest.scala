@@ -2,8 +2,10 @@ package cassandra
 
 import java.util.concurrent.TimeUnit
 
-import cassandra.FixtureFormats._
+import cassandra.fixtures.{FixtureFormats, Address, Person}
+import FixtureFormats._
 import cassandra.cql.query.GuavaFuturesAdapter
+import cassandra.fixtures.{Address, Person}
 import com.datastax.driver.core._
 import org.specs2.mutable.Specification
 import play.api.libs.iteratee.{Iteratee, Enumerator}
