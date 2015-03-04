@@ -6,23 +6,21 @@ import cassandra.format.CqlFormat
 
 trait LowPriorityImplicits{
   implicit def cqlFormat[A]: CqlFormat[A] = macro CqlMacros.cqlFormatMacro[A]
-}
 
-trait CqlImplicits extends LowPriorityImplicits{
-
-  private def makeFormat[T](f:T => CqlValue):CqlFormat[T] = new CqlFormat[T] {
+  def makeFormat[T](f:T => CqlValue):CqlFormat[T] = new CqlFormat[T] {
     override def apply(v1: T): CqlValue = f(v1)
   }
+
+}
+
+trait CqlImplicits extends TupleImplicits with LowPriorityImplicits{
+
   /* Strings */
   implicit val textFormat = makeFormat[String](text => CqlText(text))
   /* booleans*/
   implicit val booleanFormat = makeFormat[Boolean]{
     case true => CqlTrue
     case false => CqlTrue
-  }
-
-  implicit def tupleFormat[T<:Product]:CqlFormat[T] = makeFormat{
-    tuple => CqlTuple() //TODO: MAKE IT SO!
   }
 
   /*Lists */

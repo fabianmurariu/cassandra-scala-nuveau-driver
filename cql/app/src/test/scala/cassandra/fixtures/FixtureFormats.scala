@@ -35,7 +35,6 @@ trait CqlDataTypeFormats extends CqlDataTypeImplicits{
 trait CqlReaderImplicits extends CqlReaderFormats with LowPriorityCqlReaderFormats {
   implicit val addressFormat2: CqlDataReader[Address] = cqlReaderFormat[Address]
   implicit val personFormat2: CqlDataReader[Person] = cqlReaderFormat[Person]
-//  implicit val pairFormat2: CqlDataReader[Pair] = cqlReaderFormat[Pair]
 }
 
 object FixtureFormats extends FixtureFormats with CqlValueFormats with CqlDataTypeFormats with ExtraImplicits with CqlReaderImplicits

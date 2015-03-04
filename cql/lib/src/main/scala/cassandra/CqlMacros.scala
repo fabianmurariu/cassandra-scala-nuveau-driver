@@ -19,7 +19,7 @@ class CqlMacros(val c:blackbox.Context) {
     }).toList
 
     val cqlTypeName = tpe.baseClasses.head.name.toString.toLowerCase
-    val cqlTypeParams = q"new String($cqlTypeName)" :: subseqs
+    val cqlTypeParams = q"String.valueOf($cqlTypeName)" :: subseqs
 
     val cqlFormatter = q"""
     new CqlFormat[$tpe] {
