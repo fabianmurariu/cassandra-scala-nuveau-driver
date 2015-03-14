@@ -99,6 +99,14 @@ class CqlMacros(val c:blackbox.Context) {
   }
 
 
+  def cql(expr: c.Tree): c.Tree = {
+    val someTree = expr match {
+      case q"(..$params) => $vars==$expr" => q"val evalRightHand = () => $expr"
+      case _ => println(expr)
+    }
+    println(someTree)
+    q"Eq(25)"
+  }
 
 
 

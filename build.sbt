@@ -9,6 +9,7 @@ val commonSettings = Seq(
   resolvers += "Typesafe release" at "http://repo.typesafe.com/typesafe/releases/",
   scalacOptions ++= Seq("-deprecation", "-feature", "-language:experimental.macros"),
   libraryDependencies ++= Seq(
+    "com.chuusai" %% "shapeless" % "2.1.0",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.4",
     "com.typesafe.play" %% "play-iteratees" %"2.4.0-M2",
