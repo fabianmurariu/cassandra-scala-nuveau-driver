@@ -5,6 +5,7 @@ import cassandra.cql.CqlValue
 import cassandra.format.CqlFormat
 
 import scala.reflect.macros.blackbox
+import scala.reflect.macros.whitebox.Context
 
 class CqlMacros(val c:blackbox.Context) {
   import c.universe._
@@ -107,7 +108,5 @@ class CqlMacros(val c:blackbox.Context) {
     println(someTree)
     q"Eq(25)"
   }
-
-
 
 }
