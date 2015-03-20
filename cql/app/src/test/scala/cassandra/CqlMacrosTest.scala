@@ -1,9 +1,15 @@
 package cassandra
 
+import java.time.LocalDateTime._
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_DATE_TIME
+
 import cassandra.annotations.Id
 import cassandra.cql._
 import cassandra.fixtures.{FixtureFormats, Address, Person}
 import cassandra.format.DataTypeFormat
+import org.joda.time.DateTimeZone.UTC
+import org.joda.time.{DateTimeZone, DateTime}
 import org.specs2.mutable.Specification
 import FixtureFormats._
 
@@ -12,7 +18,7 @@ class CqlMacrosTest extends Specification {
   "CqlMacros" should {
     "writeCql" should {
       "produce the correct CqlType" in {
-        val p = Person("john doe", 23, Address(12, "Lula Str", home = true), Some(165), List("Jack", "Black"))
+        val p = Person("john doe", 23, Address(12, "Lula Str", home = true), Some(165), List("Jack", "Black"), parse("2007-04-03T10:15:30.555Z", ISO_DATE_TIME))
         val cqlValue = personCqlValueFormat(p)
         cqlValue === CqlType("person",
           "name" -> CqlText("john doe"),
@@ -24,7 +30,8 @@ class CqlMacrosTest extends Specification {
               "home" -> CqlTrue
             ),
           "height" -> CqlNumber(165),
-          "otherNames" -> CqlList(CqlText("Jack"), CqlText("Black")))
+          "otherNames" -> CqlList(CqlText("Jack"), CqlText("Black")),
+          "birthDate" -> CqlDateTime(new DateTime(2007, 4, 3, 10, 15, 30, 555, UTC)))
 
       }
     }
@@ -33,12 +40,13 @@ class CqlMacrosTest extends Specification {
         val userDefinedType = personCqlDataTypeFormat()
         userDefinedType === UserDefineDt(
           "person",
-          List("name"),
+          List("name", "age", "birthDate"),
           "name" -> TextDt,
           "age" -> IntDt,
           "address" -> UserDefineDt("address", Nil ,"house" -> IntDt, "street" -> TextDt, "home" -> BooleanDt),
           "height" -> IntDt,
-          "otherNames" -> ListDt(TextDt))
+          "otherNames" -> ListDt(TextDt),
+          "birthDate" -> TimestampDt)
       }
     }
     "handle tuples" in {

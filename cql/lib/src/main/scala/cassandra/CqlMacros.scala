@@ -7,10 +7,10 @@ import cassandra.format.CqlFormat
 import scala.reflect.macros.blackbox
 import scala.reflect.macros.whitebox.Context
 
-class CqlMacros(val c:blackbox.Context) {
-  import c.universe._
+object CqlMacros {
 
-  def cqlFormatMacro[A: c.WeakTypeTag]: Tree = {
+  def cqlFormatMacro[A: c.WeakTypeTag](c:blackbox.Context): c.Tree = {
+    import c.universe._
     val tpe:Type = c.weakTypeOf[A]
 
     val decls: MemberScope = tpe.decls
@@ -31,7 +31,8 @@ class CqlMacros(val c:blackbox.Context) {
     cqlFormatter
   }
 
-  def cqlDataTypeFormatMacro[A: c.WeakTypeTag]: Tree = {
+  def cqlDataTypeFormatMacro[A: c.WeakTypeTag](c:blackbox.Context): c.Tree = {
+    import c.universe._
     val tpe:Type = c.weakTypeOf[A]
 
     val decls: MemberScope = tpe.decls
@@ -57,7 +58,8 @@ class CqlMacros(val c:blackbox.Context) {
     cqlDataTypeFormatter
   }
 
-  def cqlTupleTypeFormatMacro[A: c.WeakTypeTag]: Tree = {
+  def cqlTupleTypeFormatMacro[A: c.WeakTypeTag](c:blackbox.Context): c.Tree = {
+    import c.universe._
     val tpe:Type = c.weakTypeOf[A]
 
     val typeArgs = tpe.typeArgs
@@ -78,7 +80,8 @@ class CqlMacros(val c:blackbox.Context) {
     tree
   }
 
-  def cqlRowReaderMacro[A: c.WeakTypeTag]: Tree = {
+  def cqlRowReaderMacro[A: c.WeakTypeTag](c:blackbox.Context): c.Tree = {
+    import c.universe._
     val tpe:Type = c.weakTypeOf[A]
 
     val readers: List[Tree] = (tpe.decls collect {
@@ -100,7 +103,8 @@ class CqlMacros(val c:blackbox.Context) {
   }
 
 
-  def cql(expr: c.Tree): c.Tree = {
+  def cql(c:blackbox.Context)(expr: c.Tree): c.Tree = {
+    import c.universe._
     val someTree = expr match {
       case q"(..$params) => $vars==$expr" => q"val evalRightHand = () => $expr"
       case _ => println(expr)

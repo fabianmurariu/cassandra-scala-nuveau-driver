@@ -1,6 +1,8 @@
 package cassandra.cql
 
 import cassandra.format.DataTypeFormat
+import org.joda.time.DateTime
+import org.joda.time.format.ISODateTimeFormat
 
 trait CqlValue {
   def values: String
@@ -26,6 +28,10 @@ case class CqlTable(ofType: CqlType) extends CqlValue {
 
 case class CqlText(value: String) extends CqlValue {
   override lazy val values = s"'$value'"
+}
+
+case class CqlDateTime(value:DateTime) extends CqlValue{
+  override lazy val values = s"'${value.toString}'"
 }
 
 case class CqlNumber[T: Numeric](value: T) extends CqlValue {

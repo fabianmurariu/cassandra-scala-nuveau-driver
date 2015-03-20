@@ -2,6 +2,8 @@ package cassandra.statements
 
 import cassandra.cql._
 import cassandra.statements.Statements._
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone._
 import org.specs2.mutable._
 
 class StatementsTest extends Specification {
@@ -21,6 +23,12 @@ class StatementsTest extends Specification {
         "otherNames" -> CqlList(CqlText("Jack"), CqlText("Black"))))
       column.fields === "(name,age,address,height,otherNames)"
       column.insert === s"INSERT into random ${column.fields} VALUES ${column.values};"
+    }
+
+    "insert dates" in {
+      val column = CqlTable(CqlType("blerg",
+        "mdate" -> CqlDateTime(new DateTime(2007, 4, 3, 10, 15, 30, 555, UTC))))
+      column.insert === s"INSERT into blerg ${column.fields} VALUES ('2007-04-03T10:15:30.555Z');"
     }
   }
 

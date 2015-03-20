@@ -1,5 +1,7 @@
 package cassandra.cql.query
 
+import java.time.LocalDateTime._
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 import cassandra.fixtures._
@@ -17,7 +19,7 @@ class CassandraIntegrationTest extends Specification {
     "Insert into the database then read with macro formats" in {
 
       val address = Address(2, "Blula Bld", home = true)
-      val p1 = Person("carlitos", 40, address, Some(165), List("Foo", "Marg"))
+      val p1 = Person("carlitos", 40, address, Some(165), List("Foo", "Marg"), parse("2007-04-03T10:15:30.555Z", DateTimeFormatter.ISO_DATE_TIME))
 
       val cluster = CassandraCluster("localhost")
       implicit val session = cluster.connect("tevinzi")

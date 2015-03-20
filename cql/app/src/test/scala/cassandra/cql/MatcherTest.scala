@@ -46,6 +46,17 @@ class MatcherTest extends Specification{
       LtEq("age", 5).cql === "age <= 5"
       LtEq("age", 5).prepCql === ("age <= ?", List(5))
     }
+
+    "transform to Cql for And" in {
+      And(Gt("age", 18), Lt("age", 25)).cql === "age > 18 AND age < 25"
+      And(Gt("age", 18), Lt("age", 25)).prepCql === ("age > ? AND age < ?", List(18, 25))
+      And(Eq("name","ikea"), And(Gt("age", 18), Lt("age", 25))).prepCql === ("name = ? AND age > ? AND age < ?", List("ikea", 18, 25))
+    }
+
+    "transform to Cql for In" in {
+      In("name", "Huevo", "John", "Sergei").cql === "name in ('Huevo','John','Sergei')"
+      In("name", "Huevo", "John", "Sergei").prepCql === ("name in (?,?,?)", List("Huevo", "John", "Sergei"))
+    }
   }
 
 }

@@ -1,7 +1,11 @@
 package cassandra.implicits
 
+import java.time.{ZoneId, LocalDateTime}
+import java.util.Date
+
 import cassandra.format.CqlDataReader
 import com.datastax.driver.core.{GettableByNameData, UDTValue}
+import org.joda.time.DateTime
 
 import scala.collection.JavaConversions
 import scala.language.implicitConversions
@@ -23,19 +27,37 @@ trait CqlReaderFormats extends LowPriorityCqlReaderFormats{
     }
   }
 
-  implicit val stringReaderFormat = new CqlDataReader[String] {
+  implicit val localDateTimeReader:CqlDataReader[LocalDateTime] = new CqlDataReader[LocalDateTime] {
+    override def cqlClass: Class[_] = classOf[Date]
+
+    override def apply(v1: Option[String], v2: GettableByNameData): LocalDateTime = {
+      val dt = v2.getDate(v1.get)
+      LocalDateTime.ofInstant(dt.toInstant, ZoneId.systemDefault())
+    }
+  }
+
+  implicit val dateTimeReader:CqlDataReader[DateTime] = new CqlDataReader[DateTime] {
+    override def cqlClass: Class[_] = classOf[Date]
+
+    override def apply(v1: Option[String], v2: GettableByNameData): DateTime = {
+      val dt = v2.getDate(v1.get)
+      new DateTime(dt)
+    }
+  }
+
+  implicit val stringReaderFormat: CqlDataReader[String] = new CqlDataReader[String] {
     override def cqlClass: Class[_] = classOf[String]
 
     override def apply(v1: Option[String], v2: GettableByNameData): String = v2.getString(v1.get)
   }
 
-  implicit val booleanReaderFormat = new CqlDataReader[Boolean] {
+  implicit val booleanReaderFormat:CqlDataReader[Boolean] = new CqlDataReader[Boolean] {
     override def cqlClass: Class[_] = classOf[Boolean]
 
     override def apply(v1: Option[String], v2: GettableByNameData): Boolean = v2.getBool(v1.get)
   }
 
-  implicit val intReaderFormat = new CqlDataReader[Int] {
+  implicit val intReaderFormat:CqlDataReader[Int] = new CqlDataReader[Int] {
     override def cqlClass: Class[_] = classOf[Int]
 
     override def apply(v1: Option[String], v2: GettableByNameData): Int = v2.getInt(v1.get)
@@ -57,15 +79,10 @@ trait CqlReaderFormats extends LowPriorityCqlReaderFormats{
       else {
         values.head match {
           case udt: UDTValue => values.asInstanceOf[Iterable[UDTValue]].map(tFormat(None, _)).toList
+            // TODO: failures all over the place
           case _ => values.toList.asInstanceOf[List[T]]
         }
       }
     }
   }
 }
-
-//object CqlReaderFormats extends CqlReaderFormats with LowPriorityCqlReaderFormats {
-//  implicit val addressFormat2: CqlDataReader[Address] = cqlReaderFormat[Address]
-//  implicit val personFormat2: CqlDataReader[Person] = cqlReaderFormat[Person]
-//  implicit val pairFormat2: CqlDataReader[Pair] = cqlReaderFormat[Pair]
-//}

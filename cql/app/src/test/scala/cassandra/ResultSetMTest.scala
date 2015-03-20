@@ -1,5 +1,9 @@
 package cassandra
 
+import java.time.LocalDateTime
+import java.time.LocalDateTime.parse
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 import java.util.concurrent.TimeUnit
 
 import cassandra.fixtures.{FixtureFormats, Address, Person}
@@ -48,10 +52,13 @@ class ResultSetMTest extends Specification {
     val cluster = CassandraCluster("localhost")
     val session = cluster.connect("tevinzi")
 
+    session.execute("DROP TABLE if EXISTS person;")
+    session.execute("DROP TYPE if EXISTS address;")
+
     val address = Address(12, "Lula Str", home = true)
-    val p1 = Person("black americano", 120, address, Some(165), List("Jack", "Turd"))
-    val p2 = Person("sexy jade", 90, address, Some(113), List("Baah", "Mlerg"))
-    val p3 = Person("ikea", 2, address, Some(12), List("Jingle", "Baah"))
+    val p1 = Person("black americano", 120, address, Some(165), List("Jack", "Turd"), parse("2007-04-03T10:15:30.555Z", ISO_DATE_TIME))
+    val p2 = Person("sexy jade", 90, address, Some(113), List("Baah", "Mlerg"), parse("2008-05-03T10:15:30.555Z", ISO_DATE_TIME))
+    val p3 = Person("ikea", 2, address, Some(12), List("Jingle", "Baah"), parse("2009-06-03T10:15:30.555Z", ISO_DATE_TIME))
 
     session.execute(p1.insert)
     session.execute(p2.insert)
@@ -76,13 +83,12 @@ class ResultSetMTest extends Specification {
       }
     }
 
-
     val result: Future[Stream[Row]] = bRows |>>> Iteratee.fold(Stream.empty[Row])((r, e:Stream[Row]) => r ++ e)
 
     val rows = Await.result(result, Duration(15, TimeUnit.SECONDS))
     rows.foreach(println)
 
-    true === true
+    success("nothing failed")
   }
 
 }

@@ -1,8 +1,11 @@
 package cassandra.implicits
 
+import java.time.{ZoneOffset, LocalDateTime}
+
 import cassandra.CqlMacros
 import cassandra.cql._
 import cassandra.format.CqlFormat
+import org.joda.time.{DateTimeZone, DateTime}
 
 trait LowPriorityImplicits{
   implicit def cqlFormat[A]: CqlFormat[A] = macro CqlMacros.cqlFormatMacro[A]
@@ -16,14 +19,18 @@ trait LowPriorityImplicits{
 trait CqlImplicits extends TupleImplicits with LowPriorityImplicits{
 
   /* Strings */
-  implicit val textFormat = makeFormat[String](text => CqlText(text))
+  implicit val textFormat: CF[String] = makeFormat[String](text => CqlText(text))
   /* booleans*/
-  implicit val booleanFormat = makeFormat[Boolean]{
+  implicit val booleanFormat: CF[Boolean] = makeFormat[Boolean]{
     case true => CqlTrue
     case false => CqlTrue
   }
-
-  /*Lists */
+  /* DateTime */
+  implicit val localDateTimeFormat: CF[LocalDateTime] = makeFormat[LocalDateTime](ldt => {
+    CqlDateTime(new DateTime(ldt.toInstant(ZoneOffset.UTC).toEpochMilli,DateTimeZone.UTC))
+  })
+  implicit val dateTimeFormat: CF[DateTime] = makeFormat[DateTime](ldt => CqlDateTime(ldt))
+  /* Lists */
 
   class ListFormat[T:CqlFormat] extends CqlFormat[List[T]]{
     override def apply(v1: List[T]): CqlValue = {
@@ -48,12 +55,12 @@ trait CqlImplicits extends TupleImplicits with LowPriorityImplicits{
 
   /* Numbers */
 
-  implicit val intFormat = numberFormat[Int]
-  implicit val doubleFormat = numberFormat[Double]
-  implicit val floatFormat = numberFormat[Float]
-  implicit val longFormat = numberFormat[Long]
-  implicit val bigDecFormat = numberFormat[BigDecimal]
-  implicit val bigIntFormat = numberFormat[BigInt]
+  implicit val intFormat: CF[Int] = numberFormat[Int]
+  implicit val doubleFormat: CF[Double] = numberFormat[Double]
+  implicit val floatFormat: CF[Float] = numberFormat[Float]
+  implicit val longFormat: CF[Long] = numberFormat[Long]
+  implicit val bigDecFormat: CF[BigDecimal] = numberFormat[BigDecimal]
+  implicit val bigIntFormat: CF[BigInt] = numberFormat[BigInt]
 
   implicit def numberFormat[T:Numeric]: CqlFormat[T] = makeFormat(num => CqlNumber(num))
 

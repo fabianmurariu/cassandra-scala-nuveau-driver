@@ -1,8 +1,11 @@
 package cassandra.implicits
 
+import java.time.LocalDateTime
+
 import cassandra.cql._
 import cassandra.format.{CqlFormat, DataTypeFormat}
 import cassandra.CqlMacros
+import org.joda.time.DateTime
 
 import scala.language.implicitConversions
 
@@ -18,6 +21,9 @@ trait CqlDataTypeImplicits extends CqlDataTypeLowPriorityImplicits {
   implicit val doubleDataTypeFormat: DataTypeFormat[Double] = makeDataTypeFormat { () => DoubleDt}
   implicit val booleanDataTypeFormat: DataTypeFormat[Boolean] = makeDataTypeFormat { () => BooleanDt}
   implicit val stringDataTypeFormat: DataTypeFormat[String] = makeDataTypeFormat { () => TextDt}
+
+  implicit val localDateTimeDataTypeFormat: DataTypeFormat[LocalDateTime] = makeDataTypeFormat({ () => TimestampDt} )
+  implicit val jodaDateTimeDataTypeFormat: DataTypeFormat[DateTime] = makeDataTypeFormat({ () => TimestampDt} )
 
   implicit def optionsFormat[T: DataTypeFormat]: OptionFormat[T] = new OptionFormat[T]()
 
