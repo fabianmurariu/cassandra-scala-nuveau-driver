@@ -8,6 +8,7 @@ val commonSettings = Seq(
   scalaVersion := "2.11.5",
   resolvers += "Typesafe release" at "http://repo.typesafe.com/typesafe/releases/",
   scalacOptions ++= Seq("-deprecation", "-feature", "-language:experimental.macros"),
+  fork in Test := false,
   libraryDependencies ++= Seq(
     "com.chuusai" %% "shapeless" % "2.1.0",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,

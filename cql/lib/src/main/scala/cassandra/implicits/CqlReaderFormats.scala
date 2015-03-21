@@ -1,14 +1,17 @@
 package cassandra.implicits
 
+import java.time.ZoneId.of
 import java.time.{ZoneId, LocalDateTime}
 import java.util.Date
 
 import cassandra.format.CqlDataReader
 import com.datastax.driver.core.{GettableByNameData, UDTValue}
-import org.joda.time.DateTime
+import org.joda.time.DateTimeZone.UTC
+import org.joda.time.{DateTimeZone, DateTime}
 
 import scala.collection.JavaConversions
 import scala.language.implicitConversions
+import scala.language.experimental.macros
 import scala.util.Try
 import cassandra.CqlMacros
 
@@ -32,7 +35,7 @@ trait CqlReaderFormats extends LowPriorityCqlReaderFormats{
 
     override def apply(v1: Option[String], v2: GettableByNameData): LocalDateTime = {
       val dt = v2.getDate(v1.get)
-      LocalDateTime.ofInstant(dt.toInstant, ZoneId.systemDefault())
+      LocalDateTime.ofInstant(dt.toInstant, of("UTC"))
     }
   }
 
@@ -41,7 +44,7 @@ trait CqlReaderFormats extends LowPriorityCqlReaderFormats{
 
     override def apply(v1: Option[String], v2: GettableByNameData): DateTime = {
       val dt = v2.getDate(v1.get)
-      new DateTime(dt)
+      new DateTime(dt.getTime, UTC)
     }
   }
 

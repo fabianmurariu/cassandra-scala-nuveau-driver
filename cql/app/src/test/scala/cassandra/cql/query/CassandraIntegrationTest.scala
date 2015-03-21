@@ -3,6 +3,7 @@ package cassandra.cql.query
 import java.time.LocalDateTime._
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.SECONDS
 
 import cassandra.fixtures._
 import cassandra.fixtures.{FixtureFormats, Address, Person}
@@ -11,6 +12,7 @@ import cassandra.CassandraCluster
 import com.datastax.driver.core.Row
 import org.specs2.mutable.Specification
 
+import scala.concurrent.Await.ready
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 class CassandraIntegrationTest extends Specification {
@@ -25,10 +27,10 @@ class CassandraIntegrationTest extends Specification {
       implicit val session = cluster.connect("tevinzi")
 
       val response = Insert.insert(p1)
-      Await.ready(response.rsF, Duration(15, TimeUnit.SECONDS))
+      ready(response.rsF, Duration(15, SECONDS))
 
       val carlitosF : Future[List[Row]] = Select.select("select * from person where name='carlitos';").collect[List[Row]]
-      val carlitos = Await.result(carlitosF, Duration(15, TimeUnit.SECONDS))
+      val carlitos = Await.result(carlitosF, Duration(15, SECONDS))
 
       val person = personFormat2(None, carlitos.head)
       println(person)
