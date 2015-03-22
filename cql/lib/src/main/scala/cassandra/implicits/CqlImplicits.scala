@@ -6,6 +6,7 @@ import cassandra.CqlMacros
 import cassandra.cql._
 import cassandra.format.CqlFormat
 import org.joda.time.{DateTimeZone, DateTime}
+import scala.language.experimental.macros
 
 trait LowPriorityImplicits{
   implicit def cqlFormat[A]: CqlFormat[A] = macro CqlMacros.cqlFormatMacro[A]

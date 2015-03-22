@@ -1,13 +1,14 @@
 package cassandra
 
 import java.time.LocalDateTime._
-import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 import cassandra.annotations.Id
 import cassandra.cql._
+import cassandra.cql.query.MatcherAdapter
 import cassandra.fixtures.{FixtureFormats, Address, Person}
 import cassandra.format.DataTypeFormat
+import cassandra.query._
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.{DateTimeZone, DateTime}
 import org.specs2.mutable.Specification
@@ -68,6 +69,16 @@ class CqlMacrosTest extends Specification {
 
       val t7Format = tuple7Format[Double, Int, String, Boolean, String, Double, Long]
       t7Format() === TupleDt(DoubleDt, IntDt, TextDt, BooleanDt, TextDt, DoubleDt, LongDt)
+    }
+
+    "Matcher macros" should {
+      "produce matchers " in {
+        MatcherAdapter.cql[Person](_.name == "ikea") === Eq("name", "ikea")
+        MatcherAdapter.cql[Person](_.age > 24) === Gt("age", 24)
+        MatcherAdapter.cql[Person](_.age < 2) === Lt("age", 2)
+        MatcherAdapter.cql[Person](_.age <= 4) === LtEq("age", 4)
+        MatcherAdapter.cql[Person](_.age >= 25) === GtEq("age", 25)
+      }
     }
   }
 

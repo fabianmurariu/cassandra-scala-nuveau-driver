@@ -54,7 +54,7 @@ object CqlMacros {
       def apply() = UserDefineDt.apply($cqlTypeName, List(..$ids), ..$cqlDataTypes)
     }
     """
-    println(showCode(cqlDataTypeFormatter))
+//    println(showCode(cqlDataTypeFormatter))
     cqlDataTypeFormatter
   }
 
@@ -76,7 +76,7 @@ object CqlMacros {
        }
        new TupleFormat()
      """
-    println(showCode(tree))
+//    println(showCode(tree))
     tree
   }
 
@@ -98,7 +98,7 @@ object CqlMacros {
       }
     }
     """
-    println(showCode(cqlFormatter))
+//    println(showCode(cqlFormatter))
     cqlFormatter
   }
 

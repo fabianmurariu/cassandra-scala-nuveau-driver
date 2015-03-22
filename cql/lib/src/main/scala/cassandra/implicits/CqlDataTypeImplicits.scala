@@ -8,6 +8,7 @@ import cassandra.CqlMacros
 import org.joda.time.DateTime
 
 import scala.language.implicitConversions
+import scala.language.experimental.macros
 
 trait CqlDataTypeLowPriorityImplicits {
   implicit def cqlDataTypeFormat[A]: DataTypeFormat[A] = macro CqlMacros.cqlDataTypeFormatMacro[A]

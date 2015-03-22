@@ -75,9 +75,7 @@ class ResultSetMTest extends Specification {
     val cassandraPersons = rows.map(row => personFormat(None, row))
     session.close()
 
-    cassandraPersons.contains(p1)
-    cassandraPersons.contains(p2)
-    cassandraPersons.contains(p3)
+    cassandraPersons must contain(p1, p2, p3)
   }
 
 }
