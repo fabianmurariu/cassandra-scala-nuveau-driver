@@ -6,36 +6,45 @@ import shapeless.HList
 object WhiteboxCqlMacros {
 
   import scala.language.experimental.macros
+  import scala.language.existentials
 
   import scala.reflect.macros.blackbox.{Context => BlackboxContext}
-  import scala.reflect.macros.whitebox.{Context => WhiteboxContext}
 
-  def whiteboxToMatcherFromSelector[A: c.WeakTypeTag](c: WhiteboxContext)(selector: c.Tree) = {
+  def matcherFromSelector[A: c.WeakTypeTag](c: BlackboxContext)(selector: c.Tree) = {
     import c.universe._
-    println("########################## -> "+selector)
-    println(showCode(selector))
-    val result = selector match {
-      case q"(..$args) => $x.$field.==($value)" =>
-        val termName:NameApi = field
-        q"Eq(${termName.decodedName.toString}, $value)"
-      case q"(..$args) => $x.$field.>($value)" =>
-        val termName:NameApi = field
-        q"Gt(${termName.decodedName.toString}, $value)"
-      case q"(..$args) => $x.$field.<($value)" =>
-        val termName:NameApi = field
-        q"Lt(${termName.decodedName.toString}, $value)"
-      case q"(..$args) => $x.$field.>=($value)" =>
-        val termName:NameApi = field
-        q"GtEq(${termName.decodedName.toString}, $value)"
-      case q"(..$args) => $x.$field.<=($value)" =>
-        val termName:NameApi = field
-        q"LtEq(${termName.decodedName.toString}, $value)"
-//      case q"(..$args) => $body" =>
-//        whiteboxToMatcherFromSelector[A](body)
-      case _:Tree => q"AnyMatcher"
+    selector match {
+      case q"(..$args) => $fbody" => matchFunctionBody[A](c)(fbody)
     }
-    println(showCode(result))
-    result
+  }
+
+  def matchFunctionBody[A: c.WeakTypeTag](c: BlackboxContext)(selector: c.Tree) = {
+    import c.universe._
+
+    def makeSimpleMatcher(field: c.universe.NameApi, func: c.universe.NameApi, value: c.Tree) = {
+      val termNameApi: NameApi = field
+      val termName = termNameApi.decodedName.toString
+      val funcName: NameApi = func
+      funcName.decodedName.toString match {
+        case "==" => q"Eq($termName, $value)"
+        case ">" => q"Gt($termName, $value)"
+        case "<" => q"Lt($termName, $value)"
+        case "<=" => q"LtEq($termName, $value)"
+        case ">=" => q"GtEq($termName, $value)"
+      }
+    }
+
+    def breakDownSelector(innerSelector: c.Tree): c.Tree = {
+      innerSelector match {
+        case q"$x.$field.$func($value)" =>
+          makeSimpleMatcher(field, func, value)
+        case q"$x.$field.$func($value).&&($rest)" =>
+          val leftMatcher = makeSimpleMatcher(field, func, value)
+          val rightMatcher = breakDownSelector(rest)
+          q"And($leftMatcher, $rightMatcher)"
+      }
+    }
+
+    breakDownSelector(selector)
   }
 
 }

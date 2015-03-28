@@ -31,7 +31,7 @@ trait Table[T] {
 
   def findOne(selector:T => Boolean) : Future[Option[T]] = {
     import cassandra.query.Eq
-    findOne(MatcherAdapter.cql(selector))
+    findOne(MatcherAdapter.Cql(selector))
   }
 
   def find[V <: HList, M <: TraversableOnce[T]](m: Matcher[V])(implicit canBuildFrom: CanBuildFrom[M, Row, M]): Future[M] = ???

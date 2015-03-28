@@ -8,6 +8,6 @@ import scala.language.experimental.macros
 
 object MatcherAdapter {
 
-  def cql[T](selector: T => Boolean): Matcher[_ <: HList] = macro WhiteboxCqlMacros.whiteboxToMatcherFromSelector[T]
+  def Cql2[T](selector: T => Boolean): Matcher[_ <: HList] = macro WhiteboxCqlMacros.matcherFromSelector[T]
 
 }

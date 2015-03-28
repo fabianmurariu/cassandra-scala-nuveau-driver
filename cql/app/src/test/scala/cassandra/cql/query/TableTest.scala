@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 
 import cassandra.CassandraCluster
-import cassandra.cql.query.MatcherAdapter.cql
+import cassandra.cql.query.MatcherAdapter.Cql2
 import cassandra.format.{DataTypeFormat, CqlDataReader}
 import cassandra.query.{And, Eq}
 import com.datastax.driver.core.Session
@@ -51,7 +51,7 @@ class TableTest extends Specification {
           FixtureFormats.personCqlDataTypeFormat,
           global, session)
 
-        val personFO = table.findOne(cql[Person](_.name == "ikea"))
+        val personFO = table.findOne(Cql2[Person](_.name == "ikea"))
 
         session.close()
 
