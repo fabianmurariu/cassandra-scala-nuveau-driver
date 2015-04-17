@@ -10,6 +10,9 @@ val commonSettings = Seq(
   scalacOptions ++= Seq("-deprecation", "-feature", "-language:experimental.macros"),
   fork in Test := false,
   libraryDependencies ++= Seq(
+    "org.scalaz" % "scalaz-core_2.11" % "7.1.1",
+    "org.scalaz" % "scalaz-effect_2.11" % "7.1.1",
+    "org.scalaz" % "scalaz-concurrent_2.11" % "7.1.1",
     "com.chuusai" %% "shapeless" % "2.1.0",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.4",

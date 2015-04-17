@@ -13,12 +13,12 @@ class MatcherTest extends Specification{
       val eqName = Eq("name", "Jane")
       val in = In("surname", List("blarg, bloom"))
 
-      val and: And[Gt[Int], Lt[Int]] = And(gtAge, ltAge)
-      val and2: And[Gt[Int], Eq[String]] = And(gtAge, eqName)
-      val notEqName: Not[Eq[String]] = Not(eqName)
-      val notAnd: Not[And[Gt[Int], Lt[Int]]] = Not(and)
-      val notAnd2: Not[And[Gt[Int], Eq[String]]] = Not(and2)
-      val andNotAnd: And[Not[And[Gt[Int], Eq[String]]], Not[And[Gt[Int], Lt[Int]]]] = And(notAnd2, notAnd)
+//      val and: And[Gt[Int], Lt[Int]] = And(gtAge, ltAge)
+//      val and2: And[Gt[Int], Eq[String]] = And(gtAge, eqName)
+//      val notEqName: Not[Eq[String]] = Not(eqName)
+//      val notAnd: Not[And[Gt[Int], Lt[Int]]] = Not(and)
+//      val notAnd2: Not[And[Gt[Int], Eq[String]]] = Not(and2)
+//      val andNotAnd: And[Not[And[Gt[Int], Eq[String]]], Not[And[Gt[Int], Lt[Int]]]] = And(notAnd2, notAnd)
       success("type checks")
     }
 

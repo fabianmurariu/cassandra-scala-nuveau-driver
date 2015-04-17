@@ -6,13 +6,14 @@ import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 
-import cassandra.CassandraCluster
-import cassandra.cql.query.MatcherAdapter.Cql2
+import cassandra.{WhiteboxCqlMacros, CassandraCluster}
+import cassandra.cql.query.MatcherAdapter.Cql
 import cassandra.format.{DataTypeFormat, CqlDataReader}
-import cassandra.query.{And, Eq}
+import cassandra.query.{Matcher, And, Eq}
 import com.datastax.driver.core.Session
 import org.specs2.mutable.Specification
 import cassandra.fixtures._
+import shapeless.{HList, HNil}
 
 import scala.concurrent.Await.result
 import scala.concurrent.{Await, ExecutionContext}
@@ -51,7 +52,7 @@ class TableTest extends Specification {
           FixtureFormats.personCqlDataTypeFormat,
           global, session)
 
-        val personFO = table.findOne(Cql2[Person](_.name == "ikea"))
+        val personFO = table.findOne()(Cql(_.name == "ikea"))
 
         session.close()
 
