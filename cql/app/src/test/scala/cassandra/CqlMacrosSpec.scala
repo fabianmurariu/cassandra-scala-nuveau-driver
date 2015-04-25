@@ -5,19 +5,16 @@ import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 import cassandra.annotations.Id
 import cassandra.cql._
-import cassandra.cql.query.MatcherAdapter
-import cassandra.cql.query.MatcherLike
-import cassandra.cql.query.MatcherAdapter.Cql
+import cassandra.dsl.words._
 import cassandra.fixtures.{FixtureFormats, Address, Person}
 import cassandra.format.DataTypeFormat
 
-import cassandra.query._
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.{DateTimeZone, DateTime}
 import org.specs2.mutable.Specification
 import FixtureFormats._
 
-class CqlMacrosTest extends Specification {
+class CqlMacrosSpec extends Specification {
 
   "CqlMacros" should {
     "writeCql" should {
@@ -34,8 +31,8 @@ class CqlMacrosTest extends Specification {
               "home" -> CqlTrue
             ),
           "height" -> CqlNumber(165),
-          "otherNames" -> CqlList(CqlText("Jack"), CqlText("Black")),
-          "birthDate" -> CqlDateTime(new DateTime(2007, 4, 3, 10, 15, 30, 555, UTC)))
+          "othernames" -> CqlList(CqlText("Jack"), CqlText("Black")),
+          "birthdate" -> CqlDateTime(new DateTime(2007, 4, 3, 10, 15, 30, 555, UTC)))
 
       }
     }
@@ -44,13 +41,13 @@ class CqlMacrosTest extends Specification {
         val userDefinedType = personCqlDataTypeFormat()
         userDefinedType === UserDefineDt(
           "person",
-          List("name", "age", "birthDate"),
+          List("name", "age", "birthdate"),
           "name" -> TextDt,
           "age" -> IntDt,
           "address" -> UserDefineDt("address", Nil ,"house" -> IntDt, "street" -> TextDt, "home" -> BooleanDt),
           "height" -> IntDt,
-          "otherNames" -> ListDt(TextDt),
-          "birthDate" -> TimestampDt)
+          "othernames" -> ListDt(TextDt),
+          "birthdate" -> TimestampDt)
       }
     }
     "handle tuples" in {
@@ -76,14 +73,16 @@ class CqlMacrosTest extends Specification {
 
     "Matcher macros" should {
       "produce matchers " in {
-        Cql[Person](p => p.name == "ikea" && p.age < 18) === And(Eq("name", "ikea"), Lt("age", 18))
-        Cql[Person](p => p.name == "ikea" && p.age < 18 && p.age >= 5) === And(And(Eq("name", "ikea"), Lt("age", 18)), GtEq("age", 5))
-        Cql[Person](_.name == "ika") === Eq("name", "ika")
-//        Cql2[Person](p => List("ika").contains(p.name)) === In("name", "ika")
-        Cql[Person](_.age > 24) === Gt("age", 24)
-        Cql[Person](_.age < 2) === Lt("age", 2)
-        Cql[Person](_.age <= 4) === LtEq("age", 4)
-        Cql[Person](_.age >= 25) === GtEq("age", 25)
+        import cassandra.dsl.words.QueryLike
+
+        val person = WhereLike[Person]()
+        person.where(p => p.name == "ikea" && p.age < 18) === QueryLike(And(Eq("name", "ikea"), Lt("age", 18)))
+        person.where(p => p.name == "ikea" && p.age < 18 && p.age >= 5) === QueryLike(And(And(Eq("name", "ikea"), Lt("age", 18)), GtEq("age", 5)))
+        person.where(_.name == "ika") === QueryLike(Eq("name", "ika"))
+        person.where(_.age > 24) === QueryLike(Gt("age", 24))
+        person.where(_.age < 2) === QueryLike(Lt("age", 2))
+        person.where(_.age <= 4) === QueryLike(LtEq("age", 4))
+        person.where(_.age >= 25) === QueryLike(GtEq("age", 25))
       }
     }
   }

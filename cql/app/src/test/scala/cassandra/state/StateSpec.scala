@@ -4,7 +4,7 @@ import cassandra.fixtures.Person
 import org.specs2.mutable.Specification
 import State._
 
-class StateTest extends Specification {
+class StateSpec extends Specification {
 
   "state" should {
     "be lazy" in {

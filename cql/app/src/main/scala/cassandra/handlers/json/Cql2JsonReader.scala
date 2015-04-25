@@ -5,38 +5,28 @@ import java.net.InetAddress
 import java.nio.ByteBuffer
 import java.util
 import java.util.{UUID, Date}
-
-import cassandra.handlers.ReadHandler
-import cassandra.handlers.json.Cql2JsonReader.TypeProvider
 import com.datastax.driver.core.DataType.Name
 import com.datastax.driver.core.DataType.Name._
 import com.datastax.driver.core._
+import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
 import scala.collection.JavaConversions.iterableAsScalaIterable
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.mapAsScalaMap
 
-class Cql2JsonReader extends ReadHandler[JsValue]{
-
-  def read(data: Row): JsValue = {
-    val fields:Seq[(String, JsValue)] = for {
-      column <- data.getColumnDefinitions.asList()
-      name = column.getName
-    } yield name -> Cql2JsonReader.CqlToJson.toJson(name, column.getType)(data)
-    JsObject(fields)
-  }
-}
-
 object Cql2JsonReader {
 
-
-  trait ToJson{
-    def toJson(name: String, tpe : CqlTypeRef)(data: GettableByNameData): JsValue
+  def read(data: Row): JsValue = {
+    val fields: Seq[(String, JsValue)] = for {
+      column <- data.getColumnDefinitions.asList()
+      name = column.getName
+    } yield name -> Cql2JsonReader.toJson(name, CqlTypeRef(column.getType))(data)
+    JsObject(fields)
   }
 
-  class GettableDataFromValue(value:Any) extends GettableByNameData{
-    def unsafe[T]:T = value.asInstanceOf[T]
+  class GettableDataFromValue(value: Any) extends GettableByNameData {
+    def unsafe[T]: T = value.asInstanceOf[T]
     def getUUID(name: String): UUID = unsafe[UUID]
     def getVarint(name: String): BigInteger = unsafe[BigInteger]
     def getTupleValue(name: String): TupleValue = unsafe[TupleValue]
@@ -58,72 +48,51 @@ object Cql2JsonReader {
     def getString(name: String): String = unsafe[String]
   }
 
-  object CqlToJson extends ToJson{
+  private def toJson(name: String, tpe: CqlTypeRef)(data: GettableByNameData): JsValue = {
 
-    def toJson(name: String, tpe : CqlTypeRef)(data: GettableByNameData): JsValue = {
-
-      if (!tpe.isCollection) {
-        tpe.name match {
-          case BIGINT | COUNTER => JsNumber(data.getLong(name))
-          case INT => JsNumber(data.getInt(name))
-          case DOUBLE => JsNumber(data.getDouble(name))
-          case DECIMAL => JsNumber(data.getDecimal(name))
-          case FLOAT => JsNumber(data.getFloat(name).toDouble)
-          case TEXT | VARCHAR | ASCII => JsString(data.getString(name))
-          case BOOLEAN => JsBoolean(data.getBool(name))
-          case TIMESTAMP => JsNumber(data.getDate(name).getTime)
-          case Name.UUID | TIMEUUID => JsString(data.getUUID(name).toString)
-          case VARINT => JsNumber(new BigDecimal(data.getVarint(name)))
-          case UDT =>
-            val udtValue = data.getUDTValue(name)
-            val userType = udtValue.getType
-            JsObject(userType.getFieldNames.map(name => name -> toJson(name, userType.getFieldType(name))(udtValue)).toSeq)
-        }
-      } else tpe match {
-        case CqlTypeRef(LIST , true, Some(listTypeRef), None) =>
-          val values = data.getList(name, listTypeRef.name.asJavaClass())
-            .toList.map(value => toJson(null, listTypeRef)(new GettableDataFromValue(value)))
-          JsArray(values)
-        case CqlTypeRef(SET, true, Some(listTypeRef), None) =>
-          val values = data.getSet(name, listTypeRef.name.asJavaClass())
-            .toList.map(value => toJson(null, listTypeRef)(new GettableDataFromValue(value)))
-          JsArray(values)
-        case CqlTypeRef(MAP, true, None, Some((keyTypeRef, valueTypeRef))) =>
-          val values = data.getMap(name, keyTypeRef.name.asJavaClass(), valueTypeRef.name.asJavaClass())
-          ???
+    if (!tpe.isCollection) {
+      tpe.name match {
+        case BIGINT | COUNTER => JsNumber(data.getLong(name))
+        case INT => JsNumber(data.getInt(name))
+        case DOUBLE => JsNumber(data.getDouble(name))
+        case DECIMAL => JsNumber(data.getDecimal(name))
+        case FLOAT => JsNumber(data.getFloat(name).toDouble)
+        case TEXT | VARCHAR | ASCII => JsString(data.getString(name))
+        case BOOLEAN => JsBoolean(data.getBool(name))
+        case TIMESTAMP => JsNumber(data.getDate(name).getTime)
+        case Name.UUID | TIMEUUID => JsString(data.getUUID(name).toString)
+        case VARINT => JsNumber(new BigDecimal(data.getVarint(name)))
+        case UDT =>
+          val udtValue = data.getUDTValue(name)
+          val userType = udtValue.getType
+          JsObject(userType.getFieldNames.map(name => name -> toJson(name, CqlTypeRef(userType.getFieldType(name)))(udtValue)).toSeq)
       }
+    } else tpe match {
+      case CqlTypeRef(LIST, true, Some(listTypeRef), None) =>
+        val values = data.getList(name, listTypeRef.name.asJavaClass())
+          .toList.map(value => toJson(null, listTypeRef)(new GettableDataFromValue(value)))
+        JsArray(values)
+      case CqlTypeRef(SET, true, Some(listTypeRef), None) =>
+        val values = data.getSet(name, listTypeRef.name.asJavaClass())
+          .toList.map(value => toJson(null, listTypeRef)(new GettableDataFromValue(value)))
+        JsArray(values)
+      case CqlTypeRef(MAP, true, None, Some((keyTypeRef, valueTypeRef))) =>
+        val values = data.getMap(name, keyTypeRef.name.asJavaClass(), valueTypeRef.name.asJavaClass())
+        ???
     }
   }
 
-  case class CqlTypeRef(name:Name, isCollection:Boolean, listType: Option[CqlTypeRef], mapType: Option[(CqlTypeRef, CqlTypeRef)])
+  case class CqlTypeRef(name: Name, isCollection: Boolean, listType: Option[CqlTypeRef], mapType: Option[(CqlTypeRef, CqlTypeRef)])
 
-  object CqlTypeRef{
-    def apply(dt:DataType):CqlTypeRef = if (dt.isCollection) {
+  object CqlTypeRef {
+    def apply(dt: DataType): CqlTypeRef = if (dt.isCollection) {
       dt.getTypeArguments.toList match {
-        case head :: Nil => CqlTypeRef(dt.getName, dt.isCollection, Some(CqlTypeRef(head)), None )
+        case head :: Nil => CqlTypeRef(dt.getName, dt.isCollection, Some(CqlTypeRef(head)), None)
         case keyType :: valueType :: Nil => CqlTypeRef(dt.getName, dt.isCollection, None, Some((CqlTypeRef(keyType), CqlTypeRef(valueType))))
       }
-    } else CqlTypeRef(dt.getName, dt.isCollection, None ,None )
+    } else CqlTypeRef(dt.getName, dt.isCollection, None, None)
   }
 
-  implicit def dataTypeToCqlTypeRef(dt:DataType):CqlTypeRef = CqlTypeRef(dt)
-
-  trait TypeProvider{
-    def getType(name:String):CqlTypeRef
-    def size:Int
-    def names:Iterable[String]
-  }
-
-  implicit class RowTypeProvider(row:Row) extends TypeProvider{
-    def getType(name: String): CqlTypeRef = row.getColumnDefinitions.getType(name)
-    def size: Int = row.getColumnDefinitions.size()
-    def names: Iterable[String] = row.getColumnDefinitions.map(_.getName)
-  }
-
-  implicit class UserTypeProvider(udt:UserType) extends TypeProvider{
-    def getType(name: String): CqlTypeRef = udt.getFieldType(name)
-    def size: Int = udt.size()
-    def names: Iterable[String] = udt.getFieldNames
-  }
+  case class JsonReadsException(errors:Seq[(JsPath, Seq[ValidationError])]) extends RuntimeException(s"Failed to read JSON : $errors")
 
 }

@@ -1,14 +1,11 @@
 package cassandra.fixtures
 
-import cassandra.cql._
-import cassandra.format.{CqlDataReader, CqlFormat, DataTypeFormat}
+import cassandra.format.{CqlFormat, DataTypeFormat}
 import cassandra.implicits._
 import cassandra.{CqlHandler, CqlTypeHandler}
-import com.datastax.driver.core._
-import cassandra.CqlMacros
-import scala.collection.JavaConversions
+import cassandra.cql.CqlType
+import cassandra.cql.UserDefineDt
 import scala.language.implicitConversions
-import scala.util.Try
 
 trait FixtureFormats {
   implicit def toCqlHandler[T](t: T): CqlHandler[T] = new CqlHandler[T](t)
@@ -17,27 +14,19 @@ trait FixtureFormats {
 }
 
 trait CqlValueFormats extends CqlImplicits {
-  import cassandra.cql.CqlType
   implicit val addressCqlValueFormat: CqlFormat[Address] = cqlFormat[Address]
   implicit val personCqlValueFormat: CqlFormat[Person] = cqlFormat[Person]
-  implicit val pairCqlValueFormat: CqlFormat[Pair] = cqlFormat[Pair]
 
 }
 
 trait CqlDataTypeFormats extends CqlDataTypeImplicits{
-  import cassandra.cql.UserDefineDt
   implicit val addressCqlDataTypeFormat: DataTypeFormat[Address] = cqlDataTypeFormat[Address]
   implicit val personCqlDataTypeFormat: DataTypeFormat[Person] = cqlDataTypeFormat[Person]
-  implicit val pairCqlDataTypeFormat: DataTypeFormat[Pair] = cqlDataTypeFormat[Pair]
 
 }
 
-trait CqlReaderImplicits extends CqlReaderFormats with LowPriorityCqlReaderFormats {
-  implicit val addressFormat2: CqlDataReader[Address] = cqlReaderFormat[Address]
-  implicit val personFormat2: CqlDataReader[Person] = cqlReaderFormat[Person]
-}
 
-object FixtureFormats extends FixtureFormats with CqlValueFormats with CqlDataTypeFormats with ExtraImplicits with CqlReaderImplicits
+object FixtureFormats extends FixtureFormats with CqlValueFormats with CqlDataTypeFormats with ExtraImplicits
 
 object CqlValueFormats extends CqlValueFormats
 

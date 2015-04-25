@@ -1,11 +1,8 @@
 package cassandra
 
 import cassandra.annotations.Id
-import cassandra.cql.CqlValue
-import cassandra.format.CqlFormat
 
 import scala.reflect.macros.blackbox
-import scala.reflect.macros.whitebox.Context
 
 object CqlMacros {
 
@@ -22,13 +19,11 @@ object CqlMacros {
     val cqlTypeName = tpe.baseClasses.head.name.toString.toLowerCase
     val cqlTypeParams = q"String.valueOf($cqlTypeName)" :: subseqs
 
-    val cqlFormatter = q"""
+    q"""
     new CqlFormat[$tpe] {
       def apply(value: $tpe) = CqlType.apply(..$cqlTypeParams)
     }
     """
-//    println(showCode(cqlFormatter))
-    cqlFormatter
   }
 
   def cqlDataTypeFormatMacro[A: c.WeakTypeTag](c:blackbox.Context): c.Tree = {
@@ -49,13 +44,11 @@ object CqlMacros {
 
     val cqlTypeName = tpe.baseClasses.head.name.toString.toLowerCase
 
-    val cqlDataTypeFormatter = q"""
+    q"""
     new DataTypeFormat[$tpe] {
       def apply() = UserDefineDt.apply($cqlTypeName, List(..$ids), ..$cqlDataTypes)
     }
     """
-//    println(showCode(cqlDataTypeFormatter))
-    cqlDataTypeFormatter
   }
 
   def cqlTupleTypeFormatMacro[A: c.WeakTypeTag](c:blackbox.Context): c.Tree = {
@@ -67,7 +60,7 @@ object CqlMacros {
       argType => q"(implicitly[DataTypeFormat[$argType]]).apply()"
     }
 
-    val tree = q"""
+    q"""
        class TupleFormat extends DataTypeFormat[(..$typeArgs)] {
          override def apply(): CqlDataType = {
            val l = List(..$formatArgs)
@@ -76,41 +69,6 @@ object CqlMacros {
        }
        new TupleFormat()
      """
-//    println(showCode(tree))
-    tree
-  }
-
-  def cqlRowReaderMacro[A: c.WeakTypeTag](c:blackbox.Context): c.Tree = {
-    import c.universe._
-    val tpe:Type = c.weakTypeOf[A]
-
-    val readers: List[Tree] = (tpe.decls collect {
-      case method: MethodSymbol if method.isCaseAccessor =>
-        val name = method.name.decodedName.toString
-        q"""(implicitly[CqlDataReader[${method.returnType}]]).apply(Some(String.valueOf($name)),origin)"""
-    }).toList
-
-    val cqlFormatter = q"""
-    new UDTCqlDataReader[$tpe] {
-      override def apply(v1: Option[String], v2: GettableByNameData):$tpe = {
-        val origin = getWithFallBack(v1, v2)
-        new $tpe(..$readers)
-      }
-    }
-    """
-//    println(showCode(cqlFormatter))
-    cqlFormatter
-  }
-
-
-  def cql(c:blackbox.Context)(expr: c.Tree): c.Tree = {
-    import c.universe._
-    val someTree = expr match {
-      case q"(..$params) => $vars==$expr" => q"val evalRightHand = () => $expr"
-      case _ => println(expr)
-    }
-    println(someTree)
-    q"Eq(25)"
   }
 
 }

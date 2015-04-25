@@ -1,10 +1,10 @@
 package cassandra.cql
 
+import cassandra.dsl.words._
 import cassandra.fixtures.Person
-import cassandra.query._
 import org.specs2.mutable.Specification
 import shapeless.{HNil,::}
-class MatcherTest extends Specification{
+class MatcherSpec extends Specification{
 
   "Matchers" should {
     "can haz all tipez" in {
@@ -13,12 +13,8 @@ class MatcherTest extends Specification{
       val eqName:Eq[String] = Eq("name", "Jane")
       val in:In[String] = In("surname", List("blarg, bloom"))
 
-//      val and: And[Gt[Int], Lt[Int]] = And(gtAge, ltAge)
-//      val and2: And[Gt[Int], Eq[String]] = And(gtAge, eqName)
-//      val notEqName: Not[Eq[String]] = Not(eqName)
-//      val notAnd: Not[And[Gt[Int], Lt[Int]]] = Not(and)
-//      val notAnd2: Not[And[Gt[Int], Eq[String]]] = Not(and2)
-//      val andNotAnd: And[Not[And[Gt[Int], Eq[String]]], Not[And[Gt[Int], Lt[Int]]]] = And(notAnd2, notAnd)
+      val and: And[Gt[Int], Lt[Int]] = And(gtAge, ltAge)
+      val and2: And[Gt[Int], Eq[String]] = And(gtAge, eqName)
       success("type checks")
     }
 

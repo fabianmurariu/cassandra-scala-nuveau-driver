@@ -1,4 +1,4 @@
-package cassandra.cql.query
+package cassandra.futures
 
 import java.util.concurrent.Executor
 

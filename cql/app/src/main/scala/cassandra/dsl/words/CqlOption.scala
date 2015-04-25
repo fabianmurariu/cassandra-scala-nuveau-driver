@@ -1,4 +1,4 @@
-package cassandra.dsl
+package cassandra.dsl.words
 
 sealed trait CqlOption[T]{
   val value:T

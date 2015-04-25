@@ -1,4 +1,4 @@
-package cassandra.dsl
+package cassandra.dsl.words
 
 import java.time.LocalDateTime
 

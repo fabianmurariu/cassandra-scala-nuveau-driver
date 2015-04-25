@@ -1,6 +1,7 @@
 package cassandra.cql.query
 
-import cassandra.cql.query.GuavaFuturesAdapter._
+import cassandra.futures.GuavaFuturesAdapter
+import GuavaFuturesAdapter._
 import com.datastax.driver.core.{Session, Statement, Row, ResultSet}
 import play.api.libs.iteratee.Enumerator
 

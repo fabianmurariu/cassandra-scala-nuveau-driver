@@ -1,7 +1,6 @@
-package cassandra.query
+package cassandra.dsl.words
 
-import shapeless.ops.hlist.Prepend
-import shapeless.{HNil, HList, ::}
+import shapeless.{::, HList, HNil}
 
 import scala.language.{higherKinds, implicitConversions}
 
