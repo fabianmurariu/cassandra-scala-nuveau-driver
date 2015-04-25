@@ -14,6 +14,8 @@ import scala.language.higherKinds
 
 class CqlInteractionSpec extends Specification with Specs2Futures{
 
+  sequential
+
   "cql" should {
     val cluster = CassandraCluster("localhost")
     val ks = Keyspace("tevinzi", cluster)
