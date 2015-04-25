@@ -4,7 +4,7 @@ import java.time.LocalDateTime.parse
 import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 import java.util.concurrent.TimeUnit
 
-import cassandra.cql.query.{Select, GuavaFuturesAdapter}
+import cassandra.cql.query.{BasicSelect, BasicSelect$$, GuavaFuturesAdapter}
 import cassandra.fixtures.FixtureFormats._
 import cassandra.fixtures.{Address, FixtureFormats, Person}
 import com.datastax.driver.core._
@@ -69,7 +69,7 @@ class ResultSetMTest extends Specification {
     session.execute(p2.insert)
     session.execute(p3.insert)
 
-    val rowsF = Select.select("select * from PERSON").collect[List[Row]]
+    val rowsF = BasicSelect.select("select * from PERSON").collect[List[Row]]
     val rows = Await.result(rowsF, Duration(15, TimeUnit.SECONDS))
     val personFormat = FixtureFormats.personFormat2
     val cassandraPersons = rows.map(row => personFormat(None, row))

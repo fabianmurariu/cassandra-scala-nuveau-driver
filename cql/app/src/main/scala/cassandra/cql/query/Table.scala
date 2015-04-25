@@ -25,7 +25,7 @@ trait Table[T] {
     val select = QueryBuilder.select(Seq(cqlDataTypeFormat().asInstanceOf[UserDefineDt].userDefinedName), m)
     val preparedStatement = session.prepare(select)
     implicit val prepared = executionContext.prepare()
-    val futureRows = Select.select(preparedStatement.bind(vars:_*))(session, prepared).collect[List[Row]]
+    val futureRows = BasicSelect.select(preparedStatement.bind(vars:_*))(session, prepared).collect[List[Row]]
     for {
       rows <- futureRows
     } yield rows.map(cqlDataReader(None, _)).headOption
@@ -33,9 +33,9 @@ trait Table[T] {
 
   def find[V <: HList, M <: TraversableOnce[T]](m: Matcher[V])(implicit canBuildFrom: CanBuildFrom[M, Row, M]): Future[M] = ???
 
-  def insert[V <: HList](value: T)(m: Matcher[V] = AnyMatcher) = ???
+  def insert[V <: HList](value: T)(m: Matcher[V]) = ???
 
-  def update[F, V <: HList](field: Field[F])(m: Matcher[V] = AnyMatcher): Future[Unit] = ???
+  def update[F, V <: HList](field: Field[F])(m: Matcher[V]): Future[Unit] = ???
 
 }
 

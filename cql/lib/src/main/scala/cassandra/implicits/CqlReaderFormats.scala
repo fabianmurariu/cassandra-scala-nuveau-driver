@@ -89,3 +89,5 @@ trait CqlReaderFormats extends LowPriorityCqlReaderFormats{
     }
   }
 }
+
+object CqlReaderFormats extends CqlReaderFormats

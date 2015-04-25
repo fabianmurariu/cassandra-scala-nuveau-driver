@@ -8,10 +8,10 @@ class MatcherTest extends Specification{
 
   "Matchers" should {
     "can haz all tipez" in {
-      val gtAge = Gt("age", 18)
-      val ltAge = Lt("age", 25)
-      val eqName = Eq("name", "Jane")
-      val in = In("surname", List("blarg, bloom"))
+      val gtAge:Gt[Int] = Gt("age", 18)
+      val ltAge:Lt[Int] = Lt("age", 25)
+      val eqName:Eq[String] = Eq("name", "Jane")
+      val in:In[String] = In("surname", List("blarg, bloom"))
 
 //      val and: And[Gt[Int], Lt[Int]] = And(gtAge, ltAge)
 //      val and2: And[Gt[Int], Eq[String]] = And(gtAge, eqName)

@@ -7,7 +7,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
 import scala.concurrent.{Future, ExecutionContext}
 
-trait Select {
+trait BasicSelect {
   self: ResultSetHandler =>
 
   def select(query:String)
@@ -35,4 +35,4 @@ class SelectResult(lzy: Enumerator[Stream[Row]]) {
 
 }
 
-object Select extends Select with ResultSetHandler
+object BasicSelect extends BasicSelect with ResultSetHandler
